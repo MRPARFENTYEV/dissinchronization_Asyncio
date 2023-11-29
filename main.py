@@ -18,19 +18,35 @@
 from  models import StarwarsCharacter
 import aiohttp
 import  asyncio
-
+import json
 result =[]#герои
 tasks =[]#асинхронные функции
 link = 'https://swapi.dev/api/people/'
-async def main():
+'''async def main():
     async with aiohttp.ClientSession() as session:
         for i in range(1,84):
             tasks.append(get_info(link+str(i),session))
         await asyncio.gather(*tasks)# распаковка
-    save_data()
+    save_data()'''
+'''async def get_info(link:str, session:aiohttp.ClientSession):
+    pass'''
+'''def save_data():
+    pass
+
+'''
+
 
 async def get_info(link:str, session:aiohttp.ClientSession):
-    pass
+    for i in range(1, 84):
+        response = (link + str(i), session)
+        json = await response.json()
+        return json
+async def main():
+    async with aiohttp.ClientSession() as session:
+        tasks.append(get_info())
+
+        await asyncio.gather(*tasks)# распаковка
+    save_data()
 
 def save_data():
     pass

@@ -5,27 +5,28 @@ from pathlib import Path
 
 
 # создаем б.д:  createdb -U postgres db_asinc_exercise
-# conn = psycopg2.connect(database='db_asinc_exercise',user='postgres',password = 'Sqlzaebal'
-# )
-conn = psycopg2.connect(database=os.environ.get("NAME")[::],
-                        user=os.environ.get("USER")[::],
-                        password = os.environ.get("PASSWORD")[::]
+conn = psycopg2.connect(database='db_asinc_exercise',user='postgres',password = 'Sqlzaebal'
 )
+# conn = psycopg2.connect(database=os.environ.get("NAME")[::],
+#                         user=os.environ.get("USER")[::],
+#                         password = os.environ.get("PASSWORD")[::]
+# )
 with conn.cursor() as cur:
-    cur.execute("CREATE TABLE  starwars(id SERIAL PRIMARY KEY,birth_year  );")
+    cur.execute("""CREATE TABLE IF NOT EXISTS starwars(id SERIAL PRIMARY KEY,
+     birth_year VARCHAR(40),
+     eye_color VARCHAR(40),
+     films VARCHAR(40),
+     gender VARCHAR(40),
+     hair_color VARCHAR(40),
+     height VARCHAR(40),
+     homeworld VARCHAR(40),
+     mass VARCHAR(40),
+     name VARCHAR(40),
+     skin_color VARCHAR(40),
+     species VARCHAR[],
+     starships VARCHAR[],
+     vehicles VARCHAR[]
+     """)
+    conn.commit()
 
 conn.close()
-'''id - ID персонажа
-birth_year
-eye_color
-films - строка с названиями фильмов через запятую
-gender
-hair_color
-height
-homeworld
-mass
-name
-skin_color
-species - строка с названиями типов через запятую
-starships - строка с названиями кораблей через запятую
-vehicles - строка с названиями транспорта через запятую'''
