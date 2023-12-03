@@ -15,10 +15,12 @@
 # vehicles - строка с названиями транспорта через запятую
 # Данные по каждому персонажу необходимо загрузить в любую базу данных.
 # Выгрузка из апи и загрузка в базу должна происходить асинхронно.
-from  models import StarwarsCharacter
+
 import aiohttp
-import  asyncio
+import asyncio
+from more_itertools import chunked
 import json
+from models import init_db, People, Session
 result =[]#герои
 tasks =[]#асинхронные функции
 link = 'https://swapi.dev/api/people/'
@@ -35,21 +37,50 @@ link = 'https://swapi.dev/api/people/'
 
 '''
 
+CHUNK_SIZE = 10
 
-async def get_info(link:str, session:aiohttp.ClientSession):
-    for i in range(1, 84):
-        response = (link + str(i), session)
-        json = await response.json()
-        return json
+async def paste_to_db(people):
+    # print(people)
+    async with Session() as session:
+        people = [People(json=person) for person in people]
+        session.add_all(people)
+        await session.commit()
+
+        # print(param['name'])
+# async def paste_to_db(people):
+#     async with Session() as session:
+#         people =[People(json = person) for person in people]
+#         session.add_all(people)
+#         await session.commit()
+async def get_person(person_id, session):
+        response = await session.get(f'https://swapi.dev/api/people/{person_id}')
+        json_string = await response.json()
+        return json_string
+# async def main():
+#     async with aiohttp.ClientSession() as session:
+#         for people_id_chunk in chunked(range(1,83),CHUNK_SIZE):
+#             coros =[]
+#             for people_id in people_id_chunk:
+#                 coros.append(get_person(people_id,session))
+#             result = await asyncio.gather(*coros)
+#             await paste_to_db(result)
+
+
 async def main():
+    await init_db()
     async with aiohttp.ClientSession() as session:
-        tasks.append(get_info())
+        for people_id_chunk in chunked(range(1, 83), CHUNK_SIZE):
+            coros = [get_person(people_id,session) for people_id in people_id_chunk]
+            result = await asyncio.gather(*coros)
+            await paste_to_db(result)
+            # await  save_data(result)
 
-        await asyncio.gather(*tasks)# распаковка
-    save_data()
+        # tasks.append(get_info())
 
-def save_data():
-    pass
+    #     await asyncio.gather(*tasks)# распаковка
+    # save_data()
+
+
 
 
 
