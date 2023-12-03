@@ -3,14 +3,15 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, Asyn
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import JSON, String
 
+# POSTGRES_DB = os.getenv('POSTGRES_DB', 'Asyncio')
 POSTGRES_HOST = os.getenv('POSTGRES_HOST', 'localhost')
 POSTGRES_PORT = os.getenv('POSTGRES_PORT', '5431')
 POSTGRES_DB = os.getenv('POSTGRES_DB', 'db_asinc_exercise')
 POSTGRES_USER = os.getenv('POSTGRES_USER', 'postgres')
 POSTGRES_PASSWORD = os.getenv('POSTGRES_PASSWORD', 'Sqlzaebal')
 
-
-PG_DSN = f'postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}'
+PG_DSN = 'postgresql+asyncpg://postgres:Sqlzaebal@localhost:5432/async'
+# PG_DSN = f'postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}'
 engine = create_async_engine(PG_DSN)
 Session = async_sessionmaker(engine, expire_on_commit=False)
 # session = Session()

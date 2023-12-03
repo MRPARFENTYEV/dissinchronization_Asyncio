@@ -20,7 +20,8 @@ import aiohttp
 import asyncio
 from more_itertools import chunked
 import json
-from models import init_db, People, Session
+# from models import init_db, People, Session
+from alternative_models import  StarwarsCharacter,init_db,Session
 result =[]#герои
 tasks =[]#асинхронные функции
 link = 'https://swapi.dev/api/people/'
@@ -39,13 +40,14 @@ link = 'https://swapi.dev/api/people/'
 
 CHUNK_SIZE = 10
 
-async def paste_to_db(people):
-    # print(people)
+async def paste_to_db(**data):
+    # print(data)
     async with Session() as session:
-        people = [People(json=person) for person in people]
-        session.add_all(people)
+        # people = [StarwarsCharacter(json=person) for person in people]
+        session.add_all(StarwarsCharacter(**data))
         await session.commit()
-
+# # def print_():
+#     print( main())
         # print(param['name'])
 # async def paste_to_db(people):
 #     async with Session() as session:
@@ -66,27 +68,31 @@ async def get_person(person_id, session):
 #             await paste_to_db(result)
 
 
-async def main():
+async def main():# метод который json переводит в словарь
     await init_db()
     async with aiohttp.ClientSession() as session:
         for people_id_chunk in chunked(range(1, 83), CHUNK_SIZE):
             coros = [get_person(people_id,session) for people_id in people_id_chunk]
             result = await asyncio.gather(*coros)
-            await paste_to_db(result)
+            await dejesonisation(result)
+            # await paste_to_db(result)
             # await  save_data(result)
+async def dejesonisation(jsonlist):
+    for data in jsonlist:
+        print(data)
 
-        # tasks.append(get_info())
+        # data = json.load(el)
+        await paste_to_db(name=data['name'],mass=data['mass'],birth_year=data['birth_year'],eye_color=data['eye_color'],
+                            films=data['name'],gender=data['gender'], hair_color=data['gender'], height=data['height'],
+                    homeworld_=data['homeworld'], skin_color=data['skin_color'],specie=data['species'],
+                    starships = data['starships'],vehicles=data['vehicles'] )
+
+
+
+
 
     #     await asyncio.gather(*tasks)# распаковка
     # save_data()
-
-
-
-
-
-
-
-
 if __name__ == '__main__':
     asyncio.run(main())# вызов событийного цикла
 
